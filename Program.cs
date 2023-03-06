@@ -4,6 +4,7 @@ using TAO.IdentityApp.Web.Models.Context;
 using TAO.IdentityApp.Web.ValidationRules.FluentValidation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using TAO.IdentityApp.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
 });
 
-
+builder.Services.AddIdentityWithExtension();
 
 var app = builder.Build();
 
