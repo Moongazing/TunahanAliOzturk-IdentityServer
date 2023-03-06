@@ -28,7 +28,7 @@ namespace TAO.IdentityApp.Web.ValidationRules.CustomValidator
 
             if(errors.Any())
             {
-                return Task.FromResult(IdentityResult.Failed());
+                return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
             }
             return Task.FromResult(IdentityResult.Success);
 
