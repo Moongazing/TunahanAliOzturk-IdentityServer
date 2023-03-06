@@ -4,6 +4,7 @@ namespace TAO.IdentityApp.Web.ViewModels
 {
     public class SignUpViewModel
     {
+        //[Required(ErrorMess)]
         [Display(Name = "User Name:")]
         public string UserName { get; set; }
         [Display(Name = "Email:")]

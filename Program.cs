@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using TAO.IdentityApp.Web.Models;
 using TAO.IdentityApp.Web.Models.Context;
+using TAO.IdentityApp.Web.ValidationRules.FluentValidation;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllersWithViews().AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<SignUpViewModelValidator>());
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

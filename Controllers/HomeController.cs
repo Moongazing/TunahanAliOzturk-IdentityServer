@@ -33,6 +33,11 @@ namespace TAO.IdentityApp.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(SignUpViewModel request)
         {
+            if(!ModelState.IsValid)
+            {
+                return View();
+            }
+
           var identityResult = await  _userManager.CreateAsync(new() {UserName= request.UserName,PhoneNumber = request.Phone,Email= request.Email,},request.Password);
 
             if(identityResult.Succeeded)
