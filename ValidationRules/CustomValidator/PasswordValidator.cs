@@ -12,17 +12,17 @@ namespace TAO.IdentityApp.Web.ValidationRules.CustomValidator
             {
                 errors.Add(new()
                 {
-                    Code = "PasswordCantContainUserName",
+                    Code = "PasswordContainsUserName",
                     Description = "Password can't contains username.",
 
                 });
             }
-            if(password!.ToLower().StartsWith("1234567890"))
+            if(password!.ToLower().StartsWith("1234"))
             {
                 errors.Add(new()
                 {
-                    Code = "PasswordCantStartWithADigit",
-                    Description = "Password can't start with a digit."
+                    Code = "PasswordTakeConsecutiveNumbers",
+                    Description = "Password can't take consecutive numbers."
                 });
             }
 

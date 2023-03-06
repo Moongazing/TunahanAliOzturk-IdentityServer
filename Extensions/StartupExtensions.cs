@@ -19,7 +19,10 @@ namespace TAO.IdentityApp.Web.Extensions
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = false;
 
-            }).AddPasswordValidator<PasswordValidator>().AddEntityFrameworkStores<AppDbContext>();
+            })
+             .AddPasswordValidator<PasswordValidator>()
+             .AddUserValidator<UserNameValidator>()
+             .AddEntityFrameworkStores<AppDbContext>();
         }
     }
 }
