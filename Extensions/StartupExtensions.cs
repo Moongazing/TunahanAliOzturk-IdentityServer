@@ -1,5 +1,6 @@
 ﻿using TAO.IdentityApp.Web.Models.Context;
 using TAO.IdentityApp.Web.Models;
+using TAO.IdentityApp.Web.ValidationRules.CustomValidator;
 
 namespace TAO.IdentityApp.Web.Extensions
 {
@@ -18,7 +19,7 @@ namespace TAO.IdentityApp.Web.Extensions
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = false;
 
-            }).AddEntityFrameworkStores<AppDbContext>();
+            }).AddPasswordValidator<PasswordValidator>().AddEntityFrameworkStores<AppDbContext>();
         }
     }
 }
