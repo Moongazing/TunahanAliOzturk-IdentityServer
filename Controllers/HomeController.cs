@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TAO.IdentityApp.Web.Models;
 using TAO.IdentityApp.Web.ViewModels;
+using TAO.IdentityApp.Web.Extensions;
 
 namespace TAO.IdentityApp.Web.Controllers
 {
@@ -10,10 +11,12 @@ namespace TAO.IdentityApp.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AppUser> _userManager;
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager)
+        private readonly SignInManager<AppUser> _signInManager;
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _logger = logger;
+            _signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -35,25 +38,50 @@ namespace TAO.IdentityApp.Web.Controllers
             return View();
         }
         [HttpPost]
+        public async Task<IActionResult> SignIn(SignInViewModel request,string returnUrl=null)
+        {
+            returnUrl = returnUrl ?? Url.Action("Index","Home");
+
+            var hasUser = await _userManager.FindByEmailAsync(request.Email);
+            if(hasUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "Wrong email or password!");
+                return View();
+            }
+            
+            var result = await _signInManager.PasswordSignInAsync(user:hasUser,password:request.Password, isPersistent:request.RememberMe, lockoutOnFailure:false);
+
+            if(result.Succeeded)
+            {
+                return Redirect(returnUrl);
+            }
+
+            ModelState.AddModelErrorList(new List<string>() { 
+            "Wrong email or password."
+            });
+            return View(result);
+
+            
+
+
+        }
+        [HttpPost]
         public async Task<IActionResult> SignUp(SignUpViewModel request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View();
             }
 
-          var identityResult = await  _userManager.CreateAsync(new() {UserName= request.UserName,PhoneNumber = request.Phone,Email= request.Email,},request.Password);
+            var identityResult = await _userManager.CreateAsync(new() { UserName = request.UserName, PhoneNumber = request.Phone, Email = request.Email, }, request.Password);
 
-            if(identityResult.Succeeded)
+            if (identityResult.Succeeded)
             {
                 TempData["SuccessMessage"] = "Successed.";
                 return RedirectToAction(nameof(HomeController.SignUp));
             }
 
-            foreach (IdentityError item in identityResult.Errors)
-            {
-                ModelState.AddModelError(string.Empty,item.Description);
-            }
+            ModelState.AddModelErrorList(identityResult.Errors.Select(x => x.Description).ToList());
 
             return View();
         }
