@@ -12,9 +12,9 @@ namespace TAO.IdentityApp.Web.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
 
             return RedirectToAction("Index","Home");
         }
