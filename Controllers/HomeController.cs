@@ -4,6 +4,7 @@ using System.Diagnostics;
 using TAO.IdentityApp.Web.Models;
 using TAO.IdentityApp.Web.ViewModels;
 using TAO.IdentityApp.Web.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TAO.IdentityApp.Web.Controllers
 {
@@ -38,30 +39,42 @@ namespace TAO.IdentityApp.Web.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> SignIn(SignInViewModel request,string returnUrl=null)
+        public async Task<IActionResult> SignIn(SignInViewModel request, string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Action("Index","Home");
+            returnUrl = returnUrl ?? Url.Action("Index", "Home");
 
             var hasUser = await _userManager.FindByEmailAsync(request.Email);
-            if(hasUser == null)
+            if (hasUser == null)
             {
                 ModelState.AddModelError(string.Empty, "Wrong email or password!");
                 return View();
             }
-            
-            var result = await _signInManager.PasswordSignInAsync(user:hasUser,password:request.Password, isPersistent:request.RememberMe, lockoutOnFailure:false);
 
-            if(result.Succeeded)
+            var result = await _signInManager.PasswordSignInAsync(user: hasUser, password: request.Password, isPersistent: request.RememberMe, lockoutOnFailure: true);
+
+            if (result.Succeeded)
             {
                 return Redirect(returnUrl);
             }
 
-            ModelState.AddModelErrorList(new List<string>() { 
-            "Wrong email or password."
-            });
-            return View(result);
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelErrorList(new List<string>()
+                {
+                    "You cannot login for 3 minutes."
+                });
+                return View();
+            }
 
-            
+            ModelState.AddModelErrorList(new List<string>() {
+
+                "Wrong email or password.",
+                $" Number of failed logins: { await _userManager.GetAccessFailedCountAsync(hasUser)}"
+
+            });
+            return View();
+
+
 
 
         }

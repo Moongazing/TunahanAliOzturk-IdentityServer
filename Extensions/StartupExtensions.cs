@@ -22,6 +22,11 @@ namespace TAO.IdentityApp.Web.Extensions
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = false;
 
+
+                //Lockout
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+                options.Lockout.MaxFailedAccessAttempts = 3;
             })
              .AddPasswordValidator<PasswordValidator>()
              .AddUserValidator<UserNameValidator>()
