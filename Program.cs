@@ -8,7 +8,7 @@ using TAO.IdentityApp.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews().AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<SignUpViewModelValidator>());
+builder.Services.AddFluentValidationExtensions();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

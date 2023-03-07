@@ -1,6 +1,8 @@
 ﻿using TAO.IdentityApp.Web.Models.Context;
 using TAO.IdentityApp.Web.Models;
 using TAO.IdentityApp.Web.ValidationRules.CustomValidator;
+using FluentValidation.AspNetCore;
+using TAO.IdentityApp.Web.ViewModels;
 
 namespace TAO.IdentityApp.Web.Extensions
 {
@@ -23,6 +25,12 @@ namespace TAO.IdentityApp.Web.Extensions
              .AddPasswordValidator<PasswordValidator>()
              .AddUserValidator<UserNameValidator>()
              .AddEntityFrameworkStores<AppDbContext>();
+            
+        }
+        public static void AddFluentValidationExtensions(this IServiceCollection services)
+        {
+            
+            services.AddControllersWithViews().AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<SignUpViewModel>());
         }
     }
 }
