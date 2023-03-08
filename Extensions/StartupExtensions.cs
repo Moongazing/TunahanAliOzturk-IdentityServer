@@ -4,6 +4,7 @@ using TAO.IdentityApp.Web.ValidationRules.CustomValidator;
 using FluentValidation.AspNetCore;
 using TAO.IdentityApp.Web.ViewModels;
 using TAO.IdentityApp.Web.ValidationRules.FluentValidation;
+using Microsoft.AspNetCore.Identity;
 
 namespace TAO.IdentityApp.Web.Extensions
 {
@@ -11,6 +12,10 @@ namespace TAO.IdentityApp.Web.Extensions
     {
         public static void AddIdentityWithExtension(this IServiceCollection services)
         {
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromHours(1);
+            });
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
@@ -30,6 +35,7 @@ namespace TAO.IdentityApp.Web.Extensions
             })
              .AddPasswordValidator<PasswordValidator>()
              .AddUserValidator<UserNameValidator>()
+             .AddDefaultTokenProviders()
              .AddEntityFrameworkStores<AppDbContext>();
 
         }

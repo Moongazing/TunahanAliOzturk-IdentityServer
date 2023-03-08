@@ -5,6 +5,7 @@ using TAO.IdentityApp.Web.Models;
 using TAO.IdentityApp.Web.ViewModels;
 using TAO.IdentityApp.Web.Extensions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using TAO.IdentityApp.Web.Services;
 
 namespace TAO.IdentityApp.Web.Controllers
 {
@@ -13,11 +14,13 @@ namespace TAO.IdentityApp.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        private readonly IEmailService _emailService;
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IEmailService emailService)
         {
             _userManager = userManager;
             _logger = logger;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -98,6 +101,38 @@ namespace TAO.IdentityApp.Web.Controllers
 
             return View();
         }
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel request)
+        {
+            var hasUser = await _userManager.FindByEmailAsync(request.Email);
+            if (hasUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "No registered user found for this email address!");
+                return View();
+            }
+
+
+            string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(hasUser);
+
+            var passwordResetLink = Url.Action("ResetPassword", "Home", new
+            {
+                userId = hasUser.Id,
+                Token = passwordResetToken
+            });
+
+            await _emailService.SendResetPasswordMail(passwordResetLink!,hasUser.Email!);
+
+            TempData ["SuccessMessage"]= "Password reset link sent it your e-mail.";
+            return RedirectToAction(nameof(ForgetPassword));
+
+            
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

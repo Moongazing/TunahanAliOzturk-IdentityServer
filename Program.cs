@@ -5,6 +5,9 @@ using TAO.IdentityApp.Web.ValidationRules.FluentValidation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using TAO.IdentityApp.Web.Extensions;
+using Microsoft.AspNetCore.Identity;
+using TAO.IdentityApp.Web.OptionsModel;
+using TAO.IdentityApp.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +15,8 @@ builder.Services.AddFluentValidationExtensions();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
@@ -24,7 +28,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     var cookieBuilder = new CookieBuilder();
     cookieBuilder.Name = "ToBuyListCookie";
     options.LoginPath = new PathString("/Home/SignIn");
-    options.LogoutPath = new PathString("/Member/Logout");
+    options.LogoutPath = new PathString("/Members/Logout");
     options.Cookie = cookieBuilder;
     options.ExpireTimeSpan = TimeSpan.FromDays(60);
     options.SlidingExpiration = true;
@@ -43,6 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
 
 app.UseAuthorization();
 
