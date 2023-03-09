@@ -122,7 +122,10 @@ namespace TAO.IdentityApp.Web.Controllers
             {
                 userId = hasUser.Id,
                 Token = passwordResetToken
-            });
+            },
+            HttpContext.Request.Scheme
+           
+            );
 
             await _emailService.SendResetPasswordMail(passwordResetLink!,hasUser.Email!);
 
@@ -130,6 +133,40 @@ namespace TAO.IdentityApp.Web.Controllers
             return RedirectToAction(nameof(ForgetPassword));
 
             
+        }
+
+        public  IActionResult ResetPassword(string userId,string token)
+        {
+            TempData["userId"] = userId;
+            TempData["token"] = token;
+
+            return View(); 
+           
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel request)
+        {
+            var userId = TempData["userId"]!.ToString();
+            var token = TempData["token"]!.ToString();
+
+            var hasUser = await _userManager.FindByIdAsync(userId!);
+            if(hasUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "User not found.");
+                return View();
+            }
+            var result = await _userManager.ResetPasswordAsync(hasUser,token,request.Password);
+            if(result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "Password reseted.";
+            }
+            else
+            {
+                ModelState.AddModelErrorList(result.Errors.Select(x=>x.Description).ToList());
+               
+            }
+            return View();
+
         }
 
 
