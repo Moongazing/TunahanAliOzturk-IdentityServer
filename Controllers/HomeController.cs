@@ -15,7 +15,7 @@ namespace TAO.IdentityApp.Web.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailService _emailService;
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IEmailService emailService)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService)
         {
             _userManager = userManager;
             _logger = logger;
@@ -124,46 +124,51 @@ namespace TAO.IdentityApp.Web.Controllers
                 Token = passwordResetToken
             },
             HttpContext.Request.Scheme
-           
+
             );
 
-            await _emailService.SendResetPasswordMail(passwordResetLink!,hasUser.Email!);
+            await _emailService.SendResetPasswordMail(passwordResetLink!, hasUser.Email!);
 
-            TempData ["SuccessMessage"]= "Password reset link sent it your e-mail.";
+            TempData["SuccessMessage"] = "Password reset link sent it your e-mail.";
             return RedirectToAction(nameof(ForgetPassword));
 
-            
+
         }
 
-        public  IActionResult ResetPassword(string userId,string token)
+        public IActionResult ResetPassword(string userId, string token)
         {
             TempData["userId"] = userId;
             TempData["token"] = token;
 
-            return View(); 
-           
+            return View();
+
         }
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel request)
         {
-            var userId = TempData["userId"]!.ToString();
-            var token = TempData["token"]!.ToString();
+            var userId = TempData["userId"];
+            var token = TempData["token"];
 
-            var hasUser = await _userManager.FindByIdAsync(userId!);
-            if(hasUser == null)
+            if (userId == null || token == null)
+            {
+                throw new Exception("Something goes wrong.");
+            }
+
+            var hasUser = await _userManager.FindByIdAsync((string)userId);
+            if (hasUser == null)
             {
                 ModelState.AddModelError(string.Empty, "User not found.");
                 return View();
             }
-            var result = await _userManager.ResetPasswordAsync(hasUser,token,request.Password);
-            if(result.Succeeded)
+            var result = await _userManager.ResetPasswordAsync(hasUser, (string)token, request.Password);
+            if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Password reseted.";
             }
             else
             {
-                ModelState.AddModelErrorList(result.Errors.Select(x=>x.Description).ToList());
-               
+                ModelState.AddModelErrorList(result.Errors.Select(x => x.Description).ToList());
+
             }
             return View();
 
