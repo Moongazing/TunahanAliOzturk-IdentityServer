@@ -42,9 +42,13 @@ namespace TAO.IdentityApp.Web.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> SignIn(SignInViewModel request, string returnUrl = null)
+        public async Task<IActionResult> SignIn(SignInViewModel request, string? returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Action("Index", "Home");
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            returnUrl ??= Url.Action("Index", "Home");
 
             var hasUser = await _userManager.FindByEmailAsync(request.Email);
             if (hasUser == null)
@@ -77,9 +81,6 @@ namespace TAO.IdentityApp.Web.Controllers
             });
             return View();
 
-
-
-
         }
         [HttpPost]
         public async Task<IActionResult> SignUp(SignUpViewModel request)
@@ -105,6 +106,7 @@ namespace TAO.IdentityApp.Web.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel request)
         {
@@ -154,13 +156,13 @@ namespace TAO.IdentityApp.Web.Controllers
                 throw new Exception("Something goes wrong.");
             }
 
-            var hasUser = await _userManager.FindByIdAsync((string)userId);
+            var hasUser = await _userManager.FindByIdAsync(userId.ToString()!);
             if (hasUser == null)
             {
                 ModelState.AddModelError(string.Empty, "User not found.");
                 return View();
             }
-            var result = await _userManager.ResetPasswordAsync(hasUser, (string)token, request.Password);
+            var result = await _userManager.ResetPasswordAsync(hasUser,token.ToString()!, request.Password);
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Password reseted.";

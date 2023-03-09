@@ -7,8 +7,8 @@
                 @User.Identity.Name
         </a>
         <ul class="dropdown-menu">
-          <li> <a class="dropdown-item" style="color:black" href="#">Profile</a></li>
-          <li> <a class="dropdown-item" style="color:black" href="#">Settings</a></li>
+          <li> <a class="dropdown-item" style="color:black" asp-controller="Members" asp-action="Index">Profile</a></li>
+          <li> <a class="dropdown-item" style="color:black" asp-controller="Members" asp-action="ChangePassword">Change Password</a></li>
           <li><a class="dropdown-item" style="color:#D50000" asp-route-returnurl="/Home/Index" asp-controller="Members" asp-action="Logout">Logout</a></li>
 
         </ul>
@@ -20,4 +20,4 @@ else
     <a class="btn btn-outline-success mx-1" asp-controller:"Home" asp-action="SignIn" type="submit">Sign In</a>
     <a class="btn btn-outline-success" asp-controller:"Home" asp-action="SignUp" type="submit">Sign Up</a>
 
-}
+} 
